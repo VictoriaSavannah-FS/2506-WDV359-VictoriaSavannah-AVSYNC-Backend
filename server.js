@@ -8,6 +8,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+//  routes
+const deviceRoutes = require("./routes/deviceRoutes");
+
 // env. variables -----
 require("dotenv").config();
 
@@ -38,6 +41,9 @@ mongoose.connection.on("disconnected", () =>
  * -devices
  * - users
  */
+
+//device routes
+app.use("/api/devices", deviceRoutes);
 
 /** Healtth-check Route / is itt connected? */
 app.get("/", (req, res) => {
