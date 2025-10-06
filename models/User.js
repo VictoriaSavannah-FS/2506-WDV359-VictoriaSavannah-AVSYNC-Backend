@@ -40,6 +40,15 @@ const userSchema = new mongoose.Schema({
     enum: ["Admin", "Tech"],
     default: "Tech", //unless assigned Admin
   },
+
+  //   if they forget/need to reset password
+  isVerified: {
+    type: Boolean,
+    // OAuth automatically verifies - so will mayke this dynamic based on res.
+    default: false,
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 // export module
