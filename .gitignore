@@ -1,0 +1,14 @@
+# Node.js deps ---
+node_modules/
+
+# Env. vars-----
+.env
+
+# macOS system file
+.DS_Store
+
+
+
+
+# VS Code settings (from previous feedback--)
+.vscode/
