@@ -81,6 +81,7 @@ const deviceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  timestamps: true,
 });
 
 // export module

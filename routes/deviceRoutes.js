@@ -10,11 +10,29 @@ const router = express.Router();
 
 // * GET /devices - list ALL devices
 router.get("/", async (req, res) => {
+  // try {
+  //   // stat = OK
+  //   res.status(200).json({ message: "Get all Devices in inventory " });
+  // } catch (error) {
+  //   // stat = server err 500
+  //   res.status(500).json({ error: "failed to fetch devices  -- try again." });
+  // }
   try {
-    // stat = OK
-    res.status(200).json({ message: "Get all Devices in inventory " });
+    const mockDevices = [
+      {
+        _id: "1",
+        deviceName: "Ql5: Audio Mixer",
+        ip: "192.168.1.20",
+      },
+      {
+        _id: "2",
+        deviceName: "BlackMagic: Video Switcher",
+        ip: "192.168.1.21",
+      },
+    ];
+
+    res.status(200).json(mockDevices); // send mock data devices - TEST
   } catch (error) {
-    // stat = server err 500
     res.status(500).json({ error: "failed to fetch devices  -- try again." });
   }
 });

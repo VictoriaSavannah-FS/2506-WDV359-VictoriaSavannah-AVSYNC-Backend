@@ -20,7 +20,7 @@ const app = express();
 /**(property) Application<Record<string, any>>.use: (...handlers: RequestHandler<ParamsDictionary, any, any, qs.ParsedQs, Record<string, any>>[]) => Express (+8 overloads)
  */
 app.use(cors()); //allows x-origin req.
-app.use(express.json); //parse JSON req.
+app.use(express.json()); //parse JSON req.
 
 /** Connect MongoDB Stattus - databse!
  * https://mongoosejs.com/docs/connections.html
