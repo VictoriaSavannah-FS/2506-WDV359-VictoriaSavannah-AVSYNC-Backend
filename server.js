@@ -43,7 +43,9 @@ mongoose.connection.on("disconnected", () =>
  */
 
 //device routes
-app.use("/api/devices", deviceRoutes);
+app.use("/api/v1/devices", deviceRoutes);
+// user
+// schedules
 
 /** Healtth-check Route / is itt connected? */
 app.get("/", (req, res) => {

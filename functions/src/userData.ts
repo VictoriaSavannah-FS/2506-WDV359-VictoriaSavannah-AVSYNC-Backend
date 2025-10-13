@@ -1,3 +1,5 @@
+// references from previous class - not impleented Firebase yet- these are just a reference -----------
+
 // import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
 // // Process user profile updates with validation

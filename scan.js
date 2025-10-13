@@ -1,112 +1,56 @@
-//  test file for the local-device scann ----
-/**-https://github.com/DylanPiercey/local-devices
- * great source + examples  */
+// scan.js -- implenting axios to fetch data --
+/** Scan local network devces + and send to MaongoDb
+ * use axios for HTTP reqs/
+ * async/await function - streamline process
+ */
 
+// axios - HTTP reqs
+const axios = require("axios");
+// STILL USE Local-device to scan local netwrk for devices ---
 const find = require("local-devices");
 
-find().then((devices) => {
-  // log stats --
-  devices.forEach((device, i) => {
-    //   forEach loop - fetch props --
+// async functin to sue await - wait for res.
+async function scannerAndSaveDevs() {
+  //scan local-devices ---
+  const devices = await find();
+  // /track -- bug Log ---
+  console.log(`Found ${devices.length} device(s) ...\n`);
+
+  // for loop - go throaugh e/a device [] @ a time
+  for (const [i, device] of devices.entries()) {
+    // Data to be Send ----props/params --
+    // pyload=hold props.
+    const payload = {
+      // name/ip/mac --- deviceDeats...W/ || fallbcks----
+      deviceName: device.name || "Unknown Device",
+      ip: device.ip,
+      mac: device.mac || "00:00:00:00:00:00",
+    };
+
+    // log/track ^^^ prev. Params --
     console.log(
-      `${i + 1}. ${device.ip} — ${device.mac || "MAC Unknown"} — ${
-        device.name || "Unknown Hostname"
+      // params from thee forLoop {props:ip/mac/dName..}
+      `${i + 1}. Sending: ${payload.ip} - ${payload.mac} - ${
+        payload.deviceName
       }`
     );
-  });
-});
-
-/** For future reference   ------- 
- * // Find all local network devices.
-find().then(devices => {
-  devices /*
-  [
-    { name: '?', ip: '192.168.0.10', mac: '...' },
-    { name: '...', ip: '192.168.0.17', mac: '...' },
-    { name: '...', ip: '192.168.0.21', mac: '...' },
-    { name: '...', ip: '192.168.0.22', mac: '...' }
-  ]
-  */
-/* 
-})
- // Using a transpiler
-import find from 'local-devices'
-// Without using a transpiler
-const find = require('local-devices');
-
-// Find all local network devices.
-find().then(devices => {
-  devices /*
-  [
-    { name: '?', ip: '192.168.0.10', mac: '...' },
-    { name: '...', ip: '192.168.0.17', mac: '...' },
-    { name: '...', ip: '192.168.0.21', mac: '...' },
-    { name: '...', ip: '192.168.0.22', mac: '...' }
-  ]
-  */
-/*})
-
-// Find a single device by ip address.
-find({ address: '192.168.0.10' }).then(device => {
-  device /*
-  {
-    name: '?',
-    ip: '192.168.0.10',
-    mac: '...'
+    // send device dato - t backend w/ axios --
+    // trycatch / cath errors/falbacks
+    try {
+      // axios reqs..@api.ednpoint
+      const res = await axios.post(
+        "http://localhost:3001/api/v1/devices",
+        payload
+      );
+      // log console --- show res + IF saved @db
+      console.log(`Yess! ✅😎 Saved to DB: ${res.data.device.deviceName}`);
+    } catch (err) {
+      console.error(
+        `NOO! ❌🥺 Failed to save ${payload.ip}:`,
+        err.response?.data || err.message
+      );
+    }
   }
-  */
-
-/* }) 
-
-// Find all devices within 192.168.0.1 to 192.168.0.25 range
-find({ address: '192.168.0.1-192.168.0.25' }).then(devices => {
-    devices /*
-    [
-      { name: '?', ip: '192.168.0.10', mac: '...' },
-      { name: '...', ip: '192.168.0.17', mac: '...' },
-      { name: '...', ip: '192.168.0.21', mac: '...' },
-      { name: '...', ip: '192.168.0.22', mac: '...' }
-    ]
-    */
-/* })
-
-
-
-
-// Find all devices within /24 subnet range of 192.168.0.x
-find({ address: '192.168.0.0/24' }).then(devices => {
-    devices /*
-    [
-      { name: '?', ip: '192.168.0.10', mac: '...' },
-      { name: '...', ip: '192.168.0.50', mac: '...' },
-      { name: '...', ip: '192.168.0.155', mac: '...' },
-      { name: '...', ip: '192.168.0.211', mac: '...' }
-    ]
-    */
-/* })
-
-// Find all devices without resolving host names (Uses 'arp -an') - this is more performant if hostnames are not needed 
-// (This flag is ignored on Windows machines as 'arp -an' is not supported)
-find({ skipNameResolution: true }).then(devices => {
-    devices /*
-    [
-      { name: '?', ip: '192.168.0.10', mac: '...' },
-      { name: '?', ip: '192.168.0.50', mac: '...' },
-      { name: '?', ip: '192.168.0.155', mac: '...' },
-      { name: '?', ip: '192.168.0.211', mac: '...' }
-    ]
-    */
-/* 
-
-})
-
-// Find all devices, specifying your own path for the `arp` binary 
-find({ arpPath: '/usr/sbin/arp' }).then(devices => {
-    devices /*
-    [
-      { name: '?', ip: '192.168.0.10', mac: '...' },
-      { name: '?', ip: '192.168.0.50', mac: '...' },
-      { name: '?', ip: '192.168.0.155', mac: '...' },
-      { name: '?', ip: '192.168.0.211', mac: '...' }
-    ]})
-    */
+}
+// RUN LE FUNCTIONNE 😎 -----
+scannerAndSaveDevs();
