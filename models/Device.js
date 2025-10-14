@@ -11,7 +11,7 @@ const deviceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    manufacturer: {
+    make: {
       type: String,
       required: false,
     },

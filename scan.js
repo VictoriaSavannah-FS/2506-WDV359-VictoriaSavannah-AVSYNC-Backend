@@ -25,6 +25,17 @@ async function scannerAndSaveDevs() {
       deviceName: device.name || "Unknown Device",
       ip: device.ip,
       mac: device.mac || "00:00:00:00:00:00",
+
+      // awesome worked-- so adding the rest of my params/props
+      make: device.make || "Make Unknown",
+      model: device.model || "Model Unknown",
+      firmwareVersion: device.firmwareVersion || "Unknown",
+      serialNum: device.serialNum || "Serial # Unknown",
+      location: "",
+      room: "",
+      group: "",
+      notes: "",
+      status: "Unknown",
     };
 
     // log/track ^^^ prev. Params --
