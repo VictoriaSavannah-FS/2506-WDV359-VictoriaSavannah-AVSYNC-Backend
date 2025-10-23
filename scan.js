@@ -16,20 +16,37 @@ async function scannerAndSaveDevs() {
   // /track -- bug Log ---
   console.log(`Found ${devices.length} device(s) ...\n`);
 
+  // new! HOld # of unnamed devices -- I still want to be able to assign or know which device is which
+
+  let unnamedCount = 0;
+
   // for loop - go throaugh e/a device [] @ a time
   for (const [i, device] of devices.entries()) {
+    // THIS will the logic for fallback names for devices that are unammed (for NOW / Beta Ver.) _ assigning dynamic # to e/a to keep track of
+    let deviceName;
+    // if noDEvice name || "" => ad to counter ---
+    if (!device.name || device.name.trim() === "") {
+      // add to coutner val
+      unnamedCount++;
+      deviceName = `Unnamed Device: ${unnamedCount}`;
+    } else {
+      // IF device has name -> use that value = device.name as name
+      deviceName = device.name;
+    }
+
     // Data to be Send ----props/params --
     // pyload=hold props.
     const payload = {
       // name/ip/mac --- deviceDeats...W/ || fallbcks----
-      deviceName: device.name || "Unknown Device",
+      // deviceName: device.name || "Unknown Device",
+      deviceName,
       ip: device.ip,
       mac: device.mac || "00:00:00:00:00:00",
 
       // awesome worked-- so adding the rest of my params/props
       make: device.make || "Make Unknown",
       model: device.model || "Model Unknown",
-      firmwareVersion: device.firmwareVersion || "Unknown",
+      firmwareVersion: device.firmwareVersion || "Firmware Version Unknown",
       serialNum: device.serialNum || "Serial # Unknown",
       location: "",
       room: "",
