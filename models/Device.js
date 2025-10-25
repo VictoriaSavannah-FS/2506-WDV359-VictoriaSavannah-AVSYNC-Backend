@@ -78,6 +78,11 @@ const deviceSchema = new mongoose.Schema(
       enum: ["Online", "Offline", "Maintenance", "Unknown"],
       default: "Unknown",
     },
+    schedule: {
+      type: String,
+      enum: ["Weekly", "Monthly", "Quarterly", "Yearly", "Custom"],
+      default: "Quarterly",
+    },
     lastChecked: {
       // track date ----
       type: Date,
