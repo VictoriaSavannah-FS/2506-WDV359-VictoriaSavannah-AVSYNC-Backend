@@ -10,6 +10,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 //  routes
 const deviceRoutes = require("./routes/deviceRoutes");
+// mock data ...
+// const mockRoutes = require("./routes/mockRoutes");
 
 // env. variables -----
 require("dotenv").config();
@@ -37,15 +39,13 @@ mongoose.connection.on("disconnected", () =>
   console.log("MongoDB Status: Disconnected❌")
 );
 
-/** DEfined Routes --------
- * -devices
- * - users
+/** Defined Routes
+ * - devices (real DB)
+ * - mock (for Beta testers)
  */
-
 //device routes
 app.use("/api/v1/devices", deviceRoutes);
-// user
-// schedules
+// app.use("/api/v1/mock", mockRoutes); // Mock Devices
 
 /** Healtth-check Route / is itt connected? */
 app.get("/", (req, res) => {

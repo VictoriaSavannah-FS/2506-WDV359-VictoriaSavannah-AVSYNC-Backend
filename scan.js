@@ -82,3 +82,72 @@ async function scannerAndSaveDevs() {
 }
 // RUN LE FUNCTIONNE 😎 -----
 scannerAndSaveDevs();
+
+// // scan.js -- Save scanned devices directly to MongoDB Atlas (bypassing API)
+// /** Scan local network devices + save to MongoDB directly for Beta version */
+
+// require("dotenv").config();
+// const mongoose = require("mongoose");
+// const find = require("local-devices");
+// const Device = require("./models/Device"); // make sure path is correct!
+
+// // --- Connect directly to Atlas ---
+// mongoose
+//   .connect(process.env.MONGO_URI)
+//   .then(() => console.log("✅ Connected to MongoDB Atlas for scanning"))
+//   .catch((err) => {
+//     console.error("❌ Could not connect to MongoDB Atlas", err);
+//     process.exit(1);
+//   });
+
+// async function scannerAndSaveDevs() {
+//   console.log("🔍 Scanning local network...");
+//   const devices = await find();
+//   console.log(`Found ${devices.length} device(s) ...\n`);
+
+//   let unnamedCount = 0;
+
+//   for (const [i, device] of devices.entries()) {
+//     let deviceName;
+//     if (!device.name || device.name.trim() === "") {
+//       unnamedCount++;
+//       deviceName = `Unnamed Device: ${unnamedCount}`;
+//     } else {
+//       deviceName = device.name;
+//     }
+
+//     const payload = {
+//       deviceName,
+//       ip: device.ip,
+//       mac: device.mac || "00:00:00:00:00:00",
+//       make: device.make || "Make Unknown",
+//       model: device.model || "Model Unknown",
+//       firmwareVersion: device.firmwareVersion || "Firmware Version Unknown",
+//       serialNum: device.serialNum || "Serial # Unknown",
+//       location: "",
+//       room: "",
+//       group: "",
+//       notes: "",
+//       status: "Unknown",
+//     };
+
+//     try {
+//       const existing = await Device.findOne({ ip: payload.ip });
+//       if (existing) {
+//         console.log(`⚠️ Skipping duplicate IP: ${payload.ip}`);
+//         continue;
+//       }
+
+//       const newDevice = new Device(payload);
+//       await newDevice.save();
+//       console.log(`✅ Saved to DB: ${payload.deviceName} (${payload.ip})`);
+//     } catch (err) {
+//       console.error(`❌ Failed to save ${payload.ip}:`, err.message);
+//     }
+//   }
+
+//   console.log("🎉 Scan complete! Disconnecting...");
+//   mongoose.disconnect();
+// }
+
+// scannerAndSaveDevs();

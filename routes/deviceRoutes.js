@@ -23,14 +23,28 @@ const router = express.Router();
 /**
  * GET /devices - List ALL devicesc --------------
  */
+// router.get("/", async (req, res) => {
+//   // trycatch --- for all routes
+//   // Status codes - for all routes ----
+//   try {
+//     const devices = await Device.find(); // Get all from DB
+//     // stats =OK - res=devices
+//     res.status(200).json(devices);
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ error: "Failed to fetch devices", details: error.message });
+//   }
+// });
 router.get("/", async (req, res) => {
-  // trycatch --- for all routes
-  // Status codes - for all routes ----
+  console.log("🛰  GET /devices request received"); // ✅ added log
+
   try {
     const devices = await Device.find(); // Get all from DB
-    // stats =OK - res=devices
+    console.log("📦 Found devices:", devices.length); // ✅ added log
     res.status(200).json(devices);
   } catch (error) {
+    console.error("❌ Error fetching devices:", error);
     res
       .status(500)
       .json({ error: "Failed to fetch devices", details: error.message });
@@ -41,6 +55,7 @@ router.get("/", async (req, res) => {
  * POST /devices - Add new device --------------
  */
 router.post("/", async (req, res) => {
+  console.log("Received POST /devices", req.body?.ip);
   try {
     // trycatch --- for all routes
     // Status codes - for all routes ----
