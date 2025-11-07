@@ -88,6 +88,15 @@ const deviceSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // NEW: Maintenance Reminder Fields--> or Custom Schedule
+    reminderDate: {
+      type: String,
+      default: null,
+    },
+    reminderSent: {
+      type: Boolean,
+      default: false, //track notif. sent or X
+    },
   },
   { timestamps: true }
 );
