@@ -9,6 +9,8 @@
  * - 400: Client error
  * - 404: Not Found
  * - 500: Server error
+ *
+ * New udpate: isolate device DB per User -> the user only sees their respective devices on fetch @ frontend. Safer + only shows their devices absed on their FB-userID
  */
 
 // /**
