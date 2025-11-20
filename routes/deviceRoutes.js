@@ -10,126 +10,162 @@
  * - 404: Not Found
  * - 500: Server error
  *
- * New udpate: isolate device DB per User -> the user only sees their respective devices on fetch @ frontend. Safer + only shows their devices absed on their FB-userID
+ * 11.19New udpate: wanted to isolate device DB per User -> the user only sees their respective devices on fetch @ frontend. Safer + only shows their devices absed on their FB-userID
  */
 
-// /**
-//  * Sources:
-//  * - https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-//  * - https://mongoosejs.com/docs/models.html
-//  */
+/**
+ * Sources:
+ * - https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+ * - https://mongoosejs.com/docs/models.html
+ */
+
 const express = require("express");
 const Device = require("../models/Device");
 const router = express.Router();
 
 /**
- * GET /devices - List ALL devicesc --------------
+ * GET /devices - List ALL devices --------------
+ * UPDATED: Now ONLY retrns--> devices belongs@ userId X
+ * GET /devices?userId=SOME_UID
  */
-// router.get("/", async (req, res) => {
-//   // trycatch --- for all routes
-//   // Status codes - for all routes ----
-//   try {
-//     const devices = await Device.find(); // Get all from DB
-//     // stats =OK - res=devices
-//     res.status(200).json(devices);
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ error: "Failed to fetch devices", details: error.message });
-//   }
-// });
-router.get("/", async (req, res) => {
-  console.log("🛰  GET /devices request received"); // ✅ added log
 
+router.get("/", async (req, res) => {
+  // log----
+  console.log("🛰 GET /devices request received ---- ");
+
+  // per-user dec-----
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(400).json({
+      error: "❌ Missing userId ‼️",
+    });
+  }
+  // get userID +retun ONLY thier devices====
   try {
-    const devices = await Device.find(); // Get all from DB
-    console.log("📦 Found devices:", devices.length); // ✅ added log
+    // fetch only THIS userX devices
+    const devices = await Device.find({ userId });
+    // log ---- res.
+    console.log(`📦 Found ${devices.length} devices for user --- ${userId}`);
+    // stats code-
     res.status(200).json(devices);
   } catch (error) {
+    // log +stat ---
     console.error("❌ Error fetching devices:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch devices", details: error.message });
+    res.status(500).json({
+      error: "Failed to fetch devices",
+      details: error.message,
+    });
   }
 });
 
 /**
  * POST /devices - Add new device --------------
+ * *** userId @ from frontend/scanner
  */
+
 router.post("/", async (req, res) => {
+  // log ---
   console.log("Received POST /devices", req.body?.ip);
+
+  // rettnr + code+throw error if NO userId
+  if (!req.body.userId) {
+    return res
+      .status(400)
+      .json({ error: "userId is required for saving device ‼️" });
+  }
+
   try {
-    // trycatch --- for all routes
-    // Status codes - for all routes ----
-    // Build device from request
     const newDevice = new Device(req.body);
     const savedDevice = await newDevice.save(); // Save @DB
-    res.status(201).json({ message: "Device saved ✅😎", device: savedDevice });
+    // log res +code=succes!! let's goo!
+    res.status(201).json({
+      message: "Device saved ✅😎",
+      device: savedDevice,
+    });
   } catch (error) {
     console.error("Error saving device: ❌🥺", error);
-    res
-      .status(400)
-      .json({ error: "Failed to save device ‼️❌", details: error.message });
+    res.status(400).json({
+      error: "Failed to save device ‼️❌",
+      details: error.message,
+    });
   }
 });
 
 /**
  * PUT /devices/:id - Update SELCTD [id] device --------------
+ *ONLY updates device IF device belongs to -->userX
  */
+
 router.put("/:id", async (req, res) => {
-  // / trycatch --- for all routes
-  // Status codes - for all routes ----
+  // coed+res ? no userID----
+  if (!req.body.userId) {
+    return res.status(400).json({
+      error: "userId required in request body for update!",
+    });
+  }
+
   try {
-    // upadte by ID ---
-    const updatedDevice = await Device.findByIdAndUpdate(
-      //raget params --- Id + tagert props w/in body---
-      req.params.id,
+    // MAKE SURE device beliogsn to this X user
+    const updatedDevice = await Device.findOneAndUpdate(
+      { _id: req.params.id, userId: req.body.userId },
       req.body,
-      {
-        // return THEE NEW version ----
-        new: true,
-        // apply validaotrs from schema @ new Versions
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
-    // logic -- NOT upadte -> send res.stat+mssg
+    //
     if (!updatedDevice) {
-      return res.status(404).json({ error: "Device not found❌" });
+      return res.status(404).json({
+        error: "Device not found❌ or does NOT belong to this user",
+      });
     }
-    // ELSE ---- sucess! 200 OK -----
-    res
-      .status(200)
-      .json({ message: "Device updated ✅😁", device: updatedDevice });
+
+    res.status(200).json({
+      message: "Device updated ✅😁",
+      device: updatedDevice,
+    });
   } catch (error) {
-    // error catch all else ---
-    res
-      .status(400)
-      .json({ error: "Failed to update device❌🥺", details: error.message });
+    res.status(400).json({
+      error: "Failed to update device❌🥺",
+      details: error.message,
+    });
   }
 });
 
 /**
  * DELETE /devices/:id - Remove [id] device --------------
- * trycatch --- for all routes
- * Status codes - for all routes ----
+ * Only deletes device IF device belongs to that user
  */
+
 router.delete("/:id", async (req, res) => {
+  const userId = req.query.userId; // pass userId
+  //  IF NO userID -----
+  if (!userId) {
+    return res.status(400).json({
+      error: "userId required for delete operation",
+    });
+  }
+  // Searxh based on ID/uId----
   try {
-    // dlte based@ID ----
-    const deletedDevice = await Device.findByIdAndDelete(req.params.id);
-    //logic -- NOT upadte -> send res.stat+mssg
+    const deletedDevice = await Device.findOneAndDelete({
+      _id: req.params.id,
+      userId,
+    });
+    // IF not foudn ----
     if (!deletedDevice) {
-      return res.status(404).json({ error: "Device not found" });
+      return res.status(404).json({
+        error: "Device not found OR does NOT belong to this user",
+      });
     }
-    // ELSE ---- sucess! 200 OK -----
-    res
-      .status(200)
-      .json({ message: "Device deleted ✅", device: deletedDevice });
+    // throw sucess-
+    res.status(200).json({
+      message: "Device deleted ✅",
+      device: deletedDevice,
+    });
+    // throw err----
   } catch (error) {
-    // error catch all else ---
-    res
-      .status(500)
-      .json({ error: "Failed to delete device", details: error.message });
+    res.status(500).json({
+      error: "Failed to delete device",
+      details: error.message,
+    });
   }
 });
 

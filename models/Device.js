@@ -1,8 +1,7 @@
 // crete w/ mongoose
+// 11.19: New udpate: added FB UserID -> more secure and users access only their own devices per scan
 
 const mongoose = require("mongoose");
-// switching to validtor.js for Ip validation---
-// const validator = require("validator");
 
 const deviceSchema = new mongoose.Schema(
   {
@@ -24,20 +23,8 @@ const deviceSchema = new mongoose.Schema(
     ip: {
       type: String,
       required: true,
-      unique: true,
-      /** old code --- 
-     *   // ip validation - regex
-    // this will validate the strucute for an IPv4=1x.1x.1x.x
-    //but looking into validator.js libary for stricter IP validatoin ---
-    // match: /^(\d{1,3}\.){3}\d{1,3}$/,
-    */
-      // // w/Validator.js
+      // unique: true, -- skip for now/ uniquye Per USer now ----
 
-      // validate: {
-      //   validator: (v) => this.validate.isIP(v, 4),
-      //   message: (props) =>
-      //     `${props.value} is not a valid IPv4 address -- try again or check your IP address`,
-      // },
       //  w/ UI bakery regex!
       match: [
         /^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
@@ -47,11 +34,7 @@ const deviceSchema = new mongoose.Schema(
     mac: {
       type: String,
       required: true,
-      /** REgex Docs
-       * https://www.geeksforgeeks.org/dsa/how-to-validate-mac-address-using-regular-expression/
-       *
-       * UIBakery:https://uibakery.io/regex-library/mac-address
-       */
+
       match: /^(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})$/,
     },
     firmwareVersion: {
@@ -97,10 +80,29 @@ const deviceSchema = new mongoose.Schema(
       type: Boolean,
       default: false, //track notif. sent or X
     },
+    // MEW: userID ----
+    userId: {
+      type: String,
+      required: true,
+    },
   },
+
   { timestamps: true }
 );
+// cmpnd index --- user+ip
+deviceSchema.index({ ip: 1, userId: 1 }, { unique: true });
 
 // export module
 
 module.exports = mongoose.model("Device", deviceSchema);
+
+/**Compund Indexes
+ * reference: https://www.geeksforgeeks.org/mongodb/mongodb-compound-indexes/
+ * https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/#:~:text=Compound%20indexes%20collect%20and%20sort,index%2C%20use%20the%20following%20prototype:
+ * { item: 1, location: 1 } MongoDB can use the compound index to support queries on these field combinations:
+ *
+ * deviceSchema.index({ ip: 1, userId: 1 }, { unique: true }); --
+ * ip:1 - orders this vakeu in ascending order ++
+ * userId - also orders in ascending order
+ * BUT~ for uniqueness won't matter --> jsut helps treat both values as unique pair ---- NOW! Users can scan their devices and save e/a IP  to the DB even IF the same -BUT avoids duplcaites w/in their own scans -
+ */
