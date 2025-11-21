@@ -40,16 +40,16 @@ router.get("/", async (req, res) => {
       error: "❌ Missing userId ‼️",
     });
   }
-  // get userID +retun ONLY thier devices====
+
   try {
-    // fetch only THIS userX devices
+    // fetch only THIS users devices-----
     const devices = await Device.find({ userId });
+
     // log ---- res.
     console.log(`📦 Found ${devices.length} devices for user --- ${userId}`);
-    // stats code-
+
     res.status(200).json(devices);
   } catch (error) {
-    // log +stat ---
     console.error("❌ Error fetching devices:", error);
     res.status(500).json({
       error: "Failed to fetch devices",
@@ -67,7 +67,7 @@ router.post("/", async (req, res) => {
   // log ---
   console.log("Received POST /devices", req.body?.ip);
 
-  // rettnr + code+throw error if NO userId
+  // return+ code+throw error if NO userId
   if (!req.body.userId) {
     return res
       .status(400)
@@ -76,8 +76,9 @@ router.post("/", async (req, res) => {
 
   try {
     const newDevice = new Device(req.body);
-    const savedDevice = await newDevice.save(); // Save @DB
-    // log res +code=succes!! let's goo!
+    const savedDevice = await newDevice.save(); // Save @ DB
+
+    // log res + code = success!!
     res.status(201).json({
       message: "Device saved ✅😎",
       device: savedDevice,
@@ -93,11 +94,11 @@ router.post("/", async (req, res) => {
 
 /**
  * PUT /devices/:id - Update SELCTD [id] device --------------
- *ONLY updates device IF device belongs to -->userX
+ * ONLY updates device IF device belongs to --> userX
  */
 
 router.put("/:id", async (req, res) => {
-  // coed+res ? no userID----
+  // code + res? no userID----
   if (!req.body.userId) {
     return res.status(400).json({
       error: "userId required in request body for update!",
@@ -105,13 +106,13 @@ router.put("/:id", async (req, res) => {
   }
 
   try {
-    // MAKE SURE device beliogsn to this X user
+    // MAKE SURE device belongs to this user
     const updatedDevice = await Device.findOneAndUpdate(
       { _id: req.params.id, userId: req.body.userId },
       req.body,
       { new: true, runValidators: true }
     );
-    //
+
     if (!updatedDevice) {
       return res.status(404).json({
         error: "Device not found❌ or does NOT belong to this user",
@@ -137,30 +138,29 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const userId = req.query.userId; // pass userId
-  //  IF NO userID -----
+
   if (!userId) {
     return res.status(400).json({
       error: "userId required for delete operation",
     });
   }
-  // Searxh based on ID/uId----
+
   try {
     const deletedDevice = await Device.findOneAndDelete({
       _id: req.params.id,
       userId,
     });
-    // IF not foudn ----
+
     if (!deletedDevice) {
       return res.status(404).json({
         error: "Device not found OR does NOT belong to this user",
       });
     }
-    // throw sucess-
+
     res.status(200).json({
       message: "Device deleted ✅",
       device: deletedDevice,
     });
-    // throw err----
   } catch (error) {
     res.status(500).json({
       error: "Failed to delete device",
